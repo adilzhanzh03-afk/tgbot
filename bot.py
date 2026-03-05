@@ -283,7 +283,18 @@ async def send_final(message):
 
     await asyncio.sleep(2)
 
-    await message.answer_video(types.FSInputFile("final.mp4"))
+   await message.answer_video(
+        types.FSInputFile("final1.mp4"),
+        caption="🎬 Часть 1"
+    )
+
+    await asyncio.sleep(2)
+
+    # Вторая часть
+    await message.answer_video(
+        types.FSInputFile("final2.mp4"),
+        caption="🎬 Часть 2"
+    )
 
     await asyncio.sleep(3)
 
