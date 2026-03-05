@@ -1,7 +1,7 @@
 import asyncio
 from datetime import datetime
 from aiogram import Bot, Dispatcher, types
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, FSInputFile
 from aiogram.filters import CommandStart
 from aiogram.enums import ParseMode
 from aiogram.client.default import DefaultBotProperties
@@ -18,7 +18,10 @@ user_data = {}
 @dp.message(CommandStart())
 async def start(message: types.Message):
 
-    user_data[message.from_user.id] = {"score": 0}
+    user_data[message.from_user.id] = {
+        "score": 0,
+        "stage": "password"
+    }
 
     await message.answer(
         "Сегодня 8ое марта🌷\n"
@@ -27,20 +30,26 @@ async def start(message: types.Message):
     )
 
 
+# ================= ПАРОЛЬ =================
+
 @dp.message()
 async def password_check(message: types.Message):
 
-    if message.from_user.id not in user_data:
+    user_id = message.from_user.id
+
+    if user_id not in user_data:
         return
 
-    if "stage" not in user_data[message.from_user.id]:
+    stage = user_data[user_id].get("stage")
 
-        if message.text == "Ботик":
+    if stage == "password":
 
-            user_data[message.from_user.id]["stage"] = "quiz"
+        if message.text and message.text.lower().strip() == "ботик":
+
+            user_data[user_id]["stage"] = "quiz"
 
             await message.answer("Доступ получен💕")
-            await asyncio.sleep(2)
+            await asyncio.sleep(1)
 
             await message.answer("Квест начинается 🎮")
             await asyncio.sleep(1)
@@ -77,7 +86,6 @@ async def question_1(callback: types.CallbackQuery):
 
     await callback.message.edit_reply_markup()
 
-    await asyncio.sleep(1)
     await callback.message.answer("Следующий вопрос...")
     await asyncio.sleep(1)
 
@@ -110,7 +118,6 @@ async def question_2(callback: types.CallbackQuery):
 
     await callback.message.edit_reply_markup()
 
-    await asyncio.sleep(1)
     await callback.message.answer("Еще один вопрос...")
     await asyncio.sleep(1)
 
@@ -141,7 +148,6 @@ async def question_3(callback: types.CallbackQuery):
         user_data[callback.from_user.id]["score"] += 1
 
         await callback.message.answer("Но тебя люблю больше всего 😝")
-        await asyncio.sleep(1.5)
 
     await callback.message.edit_reply_markup()
 
@@ -203,27 +209,23 @@ async def question_5(callback: types.CallbackQuery):
         user_data[callback.from_user.id]["score"] += 1
 
         await callback.message.answer("Оч сильно скучашки 😕🫶🏽")
-        await asyncio.sleep(1.5)
 
     await callback.message.edit_reply_markup()
 
     score = user_data[callback.from_user.id]["score"]
 
-    await asyncio.sleep(2)
+    await asyncio.sleep(1)
 
     await callback.message.answer(f"Ты набрала {score}/5 ❤️")
 
     if score == 5:
         await callback.message.answer("жаным, все знаешь💗")
-
     else:
         await callback.message.answer("ничего, страшного наверное просто забыла🤍")
 
     await asyncio.sleep(2)
 
     await callback.message.answer("10 причин почему я тебя люблю 💖")
-
-    await asyncio.sleep(2)
 
     await send_reasons(callback.message)
 
@@ -233,7 +235,7 @@ async def question_5(callback: types.CallbackQuery):
 reasons = [
 "1️⃣ Я люблю тебя за то, как ты умеешь быть нежной даже тогда, когда злишься.",
 "2️⃣ Я люблю твой голос — даже через километры он для меня самый родной.",
-"3️⃣ Я люблю твои глаза(именно в их я и влюбился).",
+"3️⃣ Я люблю твои глаза (именно в них я и влюбился).",
 "4️⃣ Я люблю твою искренность.",
 "5️⃣ Я люблю как ты поддерживаешь меня.",
 "6️⃣ Я люблю как ты переживаешь за меня.",
@@ -249,11 +251,11 @@ async def send_reasons(message):
     for i in range(10):
 
         await message.answer_photo(
-            photo=types.FSInputFile(f"photo{i+1}.jpg"),
+            photo=FSInputFile(f"photo{i+1}.jpg"),
             caption=reasons[i]
         )
 
-        await asyncio.sleep(2)
+        await asyncio.sleep(1)
 
     await send_timer(message)
 
@@ -271,7 +273,7 @@ async def send_timer(message):
 
     await message.answer(f"До нашей встречи ⏳(1 мая): {days} дней {hours} часов")
 
-    await asyncio.sleep(3)
+    await asyncio.sleep(2)
 
     await send_final(message)
 
@@ -282,25 +284,25 @@ async def send_final(message):
 
     await message.answer("Ну вот и пришло время для моего поздравления:")
 
-    await asyncio.sleep(2)
+    await asyncio.sleep(1)
 
     await message.answer_video(
-        types.FSInputFile("final1.mp4"),
+        FSInputFile("final1.mp4"),
         caption="🎬 Часть 1"
     )
 
-    await asyncio.sleep(2)
+    await asyncio.sleep(1)
 
-    # Вторая часть
     await message.answer_video(
-        types.FSInputFile("final2.mp4"),
+        FSInputFile("final2.mp4"),
         caption="🎬 Часть 2"
     )
 
-    await asyncio.sleep(3)
+    await asyncio.sleep(2)
 
     await message.answer(
-        "💖 В 14:00 ТЕБЯ ЖДЕТ СЮРПРИЗ ❤️\nНИКУДА НЕ УХОДИ🫣🤫"
+        "💖 В 14:00 ТЕБЯ ЖДЕТ СЮРПРИЗ ❤️\n"
+        "НИКУДА НЕ УХОДИ🫣🤫"
     )
 
 
@@ -308,6 +310,10 @@ async def send_final(message):
 
 async def main():
     await dp.start_polling(bot)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
 
 
 if __name__ == "__main__":
