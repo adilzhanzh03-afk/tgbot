@@ -267,8 +267,9 @@ async def send_timer(message):
 
     diff = target_date - now
     days = diff.days
+    hours = diff.seconds // 3600
 
-    await message.answer(f"До нашей встречи ⏳(1 мая): {days} дней")
+    await message.answer(f"До нашей встречи ⏳(1 мая): {days} дней {hours} часов")
 
     await asyncio.sleep(3)
 
