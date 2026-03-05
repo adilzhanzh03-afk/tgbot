@@ -6,7 +6,7 @@ from aiogram.filters import CommandStart
 from aiogram.enums import ParseMode
 from aiogram.client.default import DefaultBotProperties
 
-TOKEN = "8689950461:AAGJBmNd8IAuR56ZfRC2oEbi3a_7NmANUiI"
+TOKEN = "8506900651:AAEW6zYGKlcsG3Eb9-leY5ohnwz5PLu-pNE"
 
 bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 dp = Dispatcher()
